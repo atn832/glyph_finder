@@ -1,19 +1,42 @@
 import 'dart:html';
 
-CanvasElement canvas;  
-CanvasRenderingContext2D ctx;
-
+// Must be smalle than the canvas.
 var squareSize = 20;
 
+enum Script {
+  korean, chinese
+}
+
 void main() {
-  canvas = querySelector('#canvas');
-  ctx = canvas.getContext('2d');
+  // Must match the checked radio button.
+  prepareAndCompute(Script.korean);
+
+  final radios = querySelectorAll('input');
+  radios.onClick.listen((e) {
+    final target = e.target as InputElement;
+    final scriptValue = target.value;
+    final script = Script.values.firstWhere((e) => e.toString() == scriptValue);
+
+    prepareAndCompute(script);
+  });
+}
+
+void prepareAndCompute(Script script) {
+  showText('Computing...');
+  Future.delayed(Duration(seconds: 1), () {
+    compute(script);
+  });
+}
+
+void compute(Script script) {
+  CanvasElement canvas = querySelector('#canvas');
+  CanvasRenderingContext2D ctx = canvas.getContext('2d');
   ctx.font = '${squareSize}px sans-serif';
   ctx.textBaseline = 'top';
 
   List<CharacterData> characters = [];
   DateTime start = DateTime.now();
-  for (String char in charactersToAnalyze()) {
+  for (String char in charactersToAnalyze(script)) {
     final value =  analyzeCharacter(ctx, char);
     characters.add(CharacterData(char, value));
   }
@@ -25,7 +48,7 @@ void main() {
     return cmp != 0 ? cmp : a.character.compareTo(b.character);
   });
 
-  querySelector('#output').text = characters.map((d) => d.character).join(' ');
+  showText(characters.map((d) => d.character).join(' '));
 }
 
 int analyzeCharacter(CanvasRenderingContext2D ctx, String char) {
@@ -43,19 +66,37 @@ int sum(List<int> data) {
   return total;
 }
 
-Iterable<String> charactersToAnalyze() sync* {
-  for (var code = 0xAC00; code <= 0xAC05; code++)
-    yield String.fromCharCode(code);
-  for (var code = 0xAC00; code <= 0xD7A3; code++)
-    yield String.fromCharCode(code);
-  for (var code = 0x1100; code <= 0x11FF; code++)
-    yield String.fromCharCode(code);
-  for (var code = 0x3130; code <= 0x318F; code++)
-    yield String.fromCharCode(code);
-  for (var code = 0xA960; code <= 0xA97F; code++)
-    yield String.fromCharCode(code);
-  for (var code = 0xD7B0; code <= 0xD7FF; code++)
-    yield String.fromCharCode(code);
+Iterable<String> charactersToAnalyze(Script script) sync* {
+  switch(script) {
+    // Hangul: 12k characters
+    case Script.korean:
+      for (var code = 0xAC00; code <= 0xAC05; code++)
+        yield String.fromCharCode(code);
+      for (var code = 0xAC00; code <= 0xD7A3; code++)
+        yield String.fromCharCode(code);
+      for (var code = 0x1100; code <= 0x11FF; code++)
+        yield String.fromCharCode(code);
+      for (var code = 0x3130; code <= 0x318F; code++)
+        yield String.fromCharCode(code);
+      for (var code = 0xA960; code <= 0xA97F; code++)
+        yield String.fromCharCode(code);
+      for (var code = 0xD7B0; code <= 0xD7FF; code++)
+        yield String.fromCharCode(code);
+      break;
+    // Hanja: 22k characters
+    case Script.chinese:
+      for (var code = 0x4E00; code <= 0x9FFF; code++)
+        yield String.fromCharCode(code);
+      for (var code = 0xF900; code <= 0xFAFF; code++)
+        yield String.fromCharCode(code);
+      break;
+    default:
+      throw Exception('Not supported');
+  }
+}
+
+void showText(String text) {
+  querySelector('#output').text = text;
 }
 
 class CharacterData {
