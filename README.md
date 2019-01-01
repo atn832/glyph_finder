@@ -1,6 +1,8 @@
 # glyph_finder
 
-An absolute bare-bones web app.
+A project to find the most complex characters in a few languages.
+
+![Screenshot](screenshot.png)
 
 ## Running
 
