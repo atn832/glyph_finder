@@ -16,15 +16,16 @@
   <p>
     This project finds the most 'complex' characters in a language as computed by how many black pixels each character contains.
   </p>
+  <p>
+    Choose a script:
+    <input type="radio" id="korean" name="script" value="Script.korean" checked>
+    <label for="korean">Korean</label>
+    <input type="radio" id="chinese" name="script" value="Script.chinese">
+    <label for="chinese">Chinese</label>
+  </p>
 
-  Choose a script:
-
-  <input type="radio" id="korean" name="script" value="Script.korean" checked>
-  <label for="korean">Korean</label>
-  <input type="radio" id="chinese" name="script" value="Script.chinese">
-  <label for="chinese">Chinese</label>
+  <div id="output"></div>
 
   <canvas id="canvas" width="20" height="20"></canvas>
-  <div id="output"></div>
 </body>
 </html>
