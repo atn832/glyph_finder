@@ -21,11 +21,12 @@ void main() {
   });
 }
 
-void prepareAndCompute(Script script) {
+void prepareAndCompute(Script script) async {
   showText('Computing...');
-  Future.delayed(Duration(seconds: 1), () {
-    compute(script);
-  });
+  // Wait a render cycle to display the Computing... message
+  // before computing the result.
+  await Future.delayed(Duration());
+  compute(script);
 }
 
 void compute(Script script) {
